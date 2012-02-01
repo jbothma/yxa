@@ -60,10 +60,7 @@ start(normal, [AppModule]) ->
     %% to start.
     sup_error_logger:start(),
     catch ssl:start(),
-    %% We seed SSL better after starting our configuration subsystem
-    ssl:seed([
-	      io_lib:format("~p", [now()])
-	     ]),
+
     mnesia:start(),
     ok = init_statistics(),
     case sipserver_sup:start_link(AppModule, []) of
@@ -82,16 +79,9 @@ start(normal, [AppModule]) ->
 	    end,
 	    ok = init_mnesia(MnesiaTables),
 	    ok = gen_server:call(yxa_monitor, {add_mnesia_tables, MnesiaTables}),
-	    {ok, Supervisor} = sipserver_sup:start_extras(Supervisor, AppModule, AppSupdata),
-	    %% now that everything is started, seed ssl with more stuff
-	    ssl:seed([
-		      io_lib:format("~p ~p",
-				    [now(),
-				     yxa_config:list()
-				    ])
-		     ]),
+
 	    {ok, Supervisor} = sipserver_sup:start_transportlayer(Supervisor),
-	    logger:log(normal, "proxy started (YXA version ~s)", [version:get_version()]),
+	    logger:log(normal, "proxy started (YXA version ~s)", ["TODO: hacky version"]),
 	    {ok, Supervisor};
 	Unknown ->
 	    E = lists:flatten(io_lib:format("Failed starting supervisor : ~p", [Unknown])),
@@ -196,20 +186,6 @@ ensure_mnesia_nodes_running([], _RunningNodes) ->
 %% init_mnesia_update/0, part of init_mnesia/1. Do table update if we are Mnesia db-master node.
 init_mnesia_update() ->
     %% update old database versions
-    try table_update:update() of
-	ok -> ok
-    catch
-	EType: Reason ->
-	    logger:log(error, "Startup problem: Mnesia table updating failed with '~p' reason :~n~p",
-		       [EType, Reason]),
-	    timer:sleep(3 * 1000),
-
-	    %% Although very verbose (and only outputted to the console), the output of
-	    %% mnesia:info() can be really helpfull
-	    io:format("~n~nMnesia info :~n"),
-	    mnesia:info(),
-	    throw('Mnesia table update error')
-    end,
     ok.
 
 get_remote_tables(Tables) ->

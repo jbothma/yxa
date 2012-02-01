@@ -1,0 +1,18 @@
+%% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
+
+{application, simpleapp,
+ [
+  {description, "Simple app on top of YXA"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {modules, [simpleapp]},
+  {mod, {simpleapp, []}},
+  {env, [{logger_logbasename, "/tmp/yxaboblog/bob"},
+         {homedomain, ["192.168.2.2"]},
+         {myhostnames, ["192.168.2.2"]}
+        ]}
+ ]}.

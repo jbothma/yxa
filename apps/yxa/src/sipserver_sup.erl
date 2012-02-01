@@ -18,7 +18,6 @@
 %%--------------------------------------------------------------------
 -export([
 	 start_link/2,
-	 start_extras/3,
 	 start_transportlayer/1,
 	 get_pids/0
 	]).
@@ -106,8 +105,6 @@ init({AppModule, MnesiaTables}) ->
 		 permanent, 2000, worker, [yxa_config]},
     Logger = {logger, {logger, start_link, []},
                  permanent, 2000, worker, [logger]},
-    Directory = {directory, {directory, start_link, []},
-                 permanent, 2000, worker, [directory]},
     DialogServer = {dialog_server, {dialog_server, start_link, []},
 		    permanent, 2000, worker, [dialog_server]},
     TransactionLayer = {transactionlayer,
@@ -115,21 +112,8 @@ init({AppModule, MnesiaTables}) ->
 			permanent, 2000, worker, [transactionlayer]},
     Monitor = {yxa_monitor, {yxa_monitor, start_link, [AppModule, MnesiaTables]},
 	       permanent, 2000, worker, [yxa_monitor]},
-    MyList = [CfgServer, Logger, Monitor, Directory, DialogServer, TransactionLayer],
+    MyList = [CfgServer, Logger, Monitor, DialogServer, TransactionLayer],
     {ok, {{one_for_one, 20, 60}, MyList}}.
-
-start_extras(Supervisor, AppModule, AppSupdata) ->
-    UserDb = sipuserdb:yxa_init(),
-    EventSup = {event_handler, {event_handler, start_link, [AppModule]},
-		permanent, 2000, worker, [event_handler]},
-    MyList = lists:append([EventSup], UserDb),
-    SupList = case AppSupdata of
-		  {append, AppList} when is_list(AppList) ->
-		      lists:append(MyList, AppList);
-		  none ->
-		      MyList
-	      end,
-    my_start_children(Supervisor, SupList).
 
 start_transportlayer(Supervisor) ->
     %% Start the transport layer now that we have initialized everything

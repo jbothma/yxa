@@ -1,0 +1,21 @@
+%% -*- mode: erlang; -*-
+{sys, [
+       {lib_dirs, ["../apps", "../deps", "../ext_test"]},
+       {rel, "backend", "1",
+        [
+         lager,
+         os_mon,
+         mnesia,
+         datatypes,
+         service,
+         game,
+         db,
+         user_management,
+         message,
+         controller_app,
+         utils
+        ]},
+	{profile, embedded},
+	{excl_archive_filters, [".*"]}, %% Do not archive built libs
+        {excl_sys_filters, ["^bin/.*",
+        		    "^erts.*/bin/(dialyzer|typer)"]},
