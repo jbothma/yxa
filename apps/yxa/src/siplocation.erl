@@ -268,7 +268,7 @@ register_authenticate(RegReq, OrigLogTag) when is_record(RegReq, reg_request), i
 		    %% Make event about user sucessfully registered
 		    L = [{register, ok}, {user, SIPuser},
 			 {contacts, sipheader:contact_print(Contacts)}],
-		    event_handler:generic_event(normal, location, OrigLogTag, L),
+		    %event_handler:generic_event(normal, location, OrigLogTag, L),
 		    ok;
 		{siperror, Status, Reason} ->
 		    transactionlayer:send_response_handler(THandler, Status, Reason);
@@ -288,14 +288,14 @@ register_authenticate(RegReq, OrigLogTag) when is_record(RegReq, reg_request), i
 	    transactionlayer:send_response_handler(THandler, 403, "Forbidden"),
 	    %% Make event about users failure to register
 	    L = [{register, forbidden}, {user, SipUser}, {address, sipurl:print(ToURL)}],
-	    event_handler:generic_event(normal, location, OrigLogTag, L);
+	    ok;%event_handler:generic_event(normal, location, OrigLogTag, L);
 	{{false, nomatch}, SipUser} when SipUser /= none ->
 	    logger:log(normal, "~s: SipUser ~p tried to REGISTER invalid address ~s",
 		       [LogTag, SipUser, sipurl:print(ToURL)]),
 	    transactionlayer:send_response_handler(THandler, 404, "Not Found"),
 	    %% Make event about users failure to register
 	    L = [{register, invalid_address}, {user, SipUser}, {address, sipurl:print(ToURL)}],
-	    event_handler:generic_event(normal, location, OrigLogTag, L);
+	    ok;%event_handler:generic_event(normal, location, OrigLogTag, L);
 	{false, none} ->
 	    Level = case keylist:fetch('authorization', RegReq#reg_request.header) of
 			[] -> debug;

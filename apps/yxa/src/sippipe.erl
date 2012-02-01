@@ -284,7 +284,7 @@ final_response_event(Status, Reason, Type, State) when is_atom(Type), Status >= 
 	true ->
 	    self() ! {final_response_event, L};
 	false ->
-	    event_handler:request_info(normal, State#state.branch, L)
+	    ok%event_handler:request_info(normal, State#state.branch, L)
     end;
 final_response_event(_Status, _Reason, _Type, _State) ->
     %% non-final response
