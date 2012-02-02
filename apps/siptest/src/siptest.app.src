@@ -1,0 +1,11 @@
+{application, siptest,
+ [
+  {description, "Basic sip testing facilities"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
