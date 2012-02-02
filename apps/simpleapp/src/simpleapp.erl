@@ -66,7 +66,8 @@ init() ->
 %% INVITE
 %%
 request(#request{method = "INVITE"} = Request, YxaCtx) ->
-    io:format("INVITE ~p ~p~n", [Request, YxaCtx]),
+    io:format("simpleapp received INVITE ~p ~p~n", [Request, YxaCtx]),
+    transactionlayer:send_response_handler(YxaCtx#yxa_ctx.thandler, 486, "Busy Here"),
     ok;
 
 request(Request, YxaCtx) ->
