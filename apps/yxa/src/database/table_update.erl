@@ -25,9 +25,7 @@
 %%--------------------------------------------------------------------
 %% Include files
 %%--------------------------------------------------------------------
--include("phone.hrl").
 -include("siprecords.hrl").
--include("database_regexproute.hrl").
 
 %%--------------------------------------------------------------------
 %% Records
@@ -48,130 +46,9 @@
 %%--------------------------------------------------------------------
 update() ->
     logger:log(debug, "Checking if any mnesia tables needs updating"),
-    phone(),
-    regexproute(),
     cpl_script_graph(),
     gruu(),
     ok.
-
-%%--------------------------------------------------------------------
-%% @spec    () -> void()
-%%
-%% @doc     Phone record got two new fields, add dummy fields for old
-%%          existing database entries. Change dated ~2004-12.
-%% @end
-%%--------------------------------------------------------------------
-phone() ->
-    Table = phone,
-    F = fun({phone, Number, Flags, Class, Expire, Address, ReqUriStr}) ->
-		%% check for old record lacking callid and cseq field
-		put({Table, update}, true),
-		#phone{
-		     user = Number,
-		     flags = Flags,
-		     class = Class,
-		     expire = Expire,
-		     address = Address,
-		     requristr = ReqUriStr,
-		     callid = "",
-		     cseq = 0,
-		     instance = ""
-		    };
-	   ({phone, User, Flags, Class, Expire, Address, ReqUriStr, CallId, CSeq}) ->
-		%% Add instance field with Instance ID, previously stored in Flags.
-		%% We don't care to remove it from Flags - no real need to.
-		Instance =
-		    case lists:keysearch(instance_id, 1, Flags) of
-			{value, {instance_id, InstanceId}} ->
-			    InstanceId;
-			false ->
-			    []
-		    end,
-
-		put({Table, update}, true),
-		#phone{
-		     user = User,
-		     flags = Flags,
-		     class = Class,
-		     expire = Expire,
-		     address = Address,
-		     requristr = ReqUriStr,
-		     callid = CallId,
-		     cseq = CSeq,
-		     instance = Instance
-		    };
-	   (Phone) when is_record(Phone, phone) ->
-		%% nothing to update
-		Phone
-	end,
-    do_transform_table(Table, F, record_info(fields, phone)),
-
-    case lists:member(#phone.requristr, mnesia:table_info(phone, index)) of
-	true ->
-	    ok;
-	false ->
-	    logger:log(debug, "Startup: Adding 'requristr' index to location database table 'phone'"),
-	    {atomic, ok} = mnesia:add_table_index(phone, #phone.requristr)
-    end,
-
-    case lists:member(#phone.instance, mnesia:table_info(phone, index)) of
-	true ->
-	    ok;
-	false ->
-	    logger:log(debug, "Startup: Adding 'instance' index to location database table 'phone'"),
-	    {atomic, ok} = mnesia:add_table_index(phone, #phone.instance)
-    end,
-
-    ok.
-
-
-%%--------------------------------------------------------------------
-%% @spec    () -> void()
-%%
-%% @doc     Update the sipurl record() in the regexproute, and store
-%%          it as a string instead of as a record. Change dated
-%%          2005-02.
-%% @end
-%%--------------------------------------------------------------------
-regexproute() ->
-    Table = regexproute,
-    F = fun({regexproute, Regexp, Flags,  Class,  Expire, {sipurl, Proto, User, Pass, Host, Port, Param}}) ->
-		%% old sipurl's lacking url_param field
-		put({Table, update}, true),
-		%% fixes so that url_param record is used
-		URL = sipurl:new([{proto, Proto}, {user, User}, {pass, Pass},
-				  {host, Host}, {port, Port}, {param, Param}]),
-		%% store as string instead of record, so that we don't have to do
-		%% conversions like this in the future when we modify records
-		URLstr = sipurl:print(URL),
-		#regexproute{
-				       regexp = Regexp,
-				       flags = Flags,
-				       class = Class,
-				       expire = Expire,
-				       address = URLstr
-				      };
-	   ({regexproute, Regexp, Flags,  Class,  Expire, {sipurl, Proto, User, Pass, Host, Port, _Param, UrlParam}}) ->
-		%% sipurl's with both param and url_param field
-		put({Table, update}, true),
-		URL = sipurl:new([{proto, Proto}, {user, User}, {pass, Pass},
-					{host, Host}, {port, Port}, {param, UrlParam}]),
-		%% store as string instead of record, so that we don't have to do
-		%% conversions like this in the future when we modify records
-		URLstr = sipurl:print(URL),
-		#regexproute{
-				       regexp = Regexp,
-				       flags = Flags,
-				       class = Class,
-				       expire = Expire,
-				       address = URLstr
-				      };
-	   (RegExpRoute) when is_record(RegExpRoute, regexproute) ->
-		%% nothing to update
-		RegExpRoute
-	end,
-    do_transform_table(Table, F, record_info(fields, regexproute)).
-
 
 %%--------------------------------------------------------------------
 %% @spec    () -> void()
