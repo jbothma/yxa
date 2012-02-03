@@ -1,9 +1,4 @@
 %%%===================================================================
-%%% This is an YXA application as described at
-%%% http://www.stacken.kth.se/project/yxa/architecture.html
-%%% That means it's just a module implementing the yxa_app behaviour,
-%%% not an OTP application.
-%%%
 %%% The purpose of this application is to get get a minimal SIP system
 %%% running which can reply something valid to a LISTEN and OPTIONS
 %%% request.
@@ -18,9 +13,12 @@
 	 stop/1]).
 
 %% export yxa_app callbacks
--export([init/0,
+-export([config_defaults/0,
+	 init/0,
          request/2,
-         response/2]).
+         response/2,
+	 terminate/1
+	]).
 
 %%--------------------------------------------------------------------
 %% Include files
@@ -46,6 +44,24 @@ stop(_State) ->
 %% Standard YXA SIP-application callback functions
 %%====================================================================
 
+%%--------------------------------------------------------------------
+%% @spec    () -> AppConfig
+%%
+%%            AppConfig = [#cfg_entry{}]
+%%
+%% @doc     Return application defaults.
+%% @end
+%%--------------------------------------------------------------------
+config_defaults() ->
+    [].
+
+%%--------------------------------------------------------------------
+%% @spec    () -> #yxa_app_init{}
+%%
+%% @doc     YXA applications must export an init/0 function.
+%% @hidden
+%% @end
+%%--------------------------------------------------------------------
 init() ->
     io:format("initing simpleapp~n"),
     #yxa_app_init{ sup_spec      = none,
@@ -65,7 +81,7 @@ init() ->
 %%
 %% INVITE
 %%
-request(#request{method = "INVITE"} = Request, YxaCtx) ->
+request(#request{method = "INVITE"} = _Request, YxaCtx) ->
     io:format("simpleapp received INVITE.~n"),
     transactionlayer:send_response_handler(YxaCtx#yxa_ctx.thandler,
 					   486,
@@ -94,4 +110,17 @@ request(Request, YxaCtx) ->
 %%--------------------------------------------------------------------
 response(Response, YxaCtx)->
     io:format("unhandled response ~p ~p~n", [Response, YxaCtx]),
+    ok.
+
+%%--------------------------------------------------------------------
+%% @spec    (Mode) ->
+%%            term() "Yet to be specified. Return 'ok' for now."
+%%
+%%            Mode = shutdown | graceful | atom()
+%%
+%% @doc     YXA applications must export a terminate/1 function.
+%% @hidden
+%% @end
+%%--------------------------------------------------------------------
+terminate(Mode) when is_atom(Mode) ->
     ok.

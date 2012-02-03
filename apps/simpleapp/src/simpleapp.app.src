@@ -11,8 +11,7 @@
                  ]},
   {modules, [simpleapp]},
   {mod, {simpleapp, []}},
-  {env, [{logger_logbasename, "/tmp/yxaboblog/bob"},
-         {homedomain, ["192.168.2.2"]},
+  {env, [
          {myhostnames, ["192.168.2.2"]}
         ]}
  ]}.
