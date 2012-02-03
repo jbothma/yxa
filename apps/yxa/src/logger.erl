@@ -103,13 +103,11 @@ start_link() ->
 			    {ok, LogDir} ->
 				filename:join(LogDir, AppName);
 			    none ->
-				AppName
+				"log/" ++ AppName
 			end;
 		    _ ->
-			%% TODO: fix startup so that logger gets the app name when it's not in config.
-			"/tmp/yxa_logger_hack"
-			%%io:format("ERROR: Can't start YXA logger: Application name undefined~n"),
-			%%erlang:error("YXA logger: Application name undefined")
+			io:format("ERROR: Can't start YXA logger: Application name undefined~n"),
+			erlang:error("YXA logger: Application name undefined")
 		end
 	end,
     start_link(LogBase).
