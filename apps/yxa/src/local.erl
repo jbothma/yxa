@@ -188,9 +188,6 @@
 
 -define(SIPPIPE_TIMEOUT, 900).
 
-%% TODO: hack to just get it to build from rebar for now
--define(LOCAL_MODULE, local_default).
-
 
 %%====================================================================
 %% External functions
