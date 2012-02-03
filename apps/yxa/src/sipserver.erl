@@ -81,7 +81,8 @@ start(normal, [AppModule]) ->
 	    ok = gen_server:call(yxa_monitor, {add_mnesia_tables, MnesiaTables}),
 	    {ok, Supervisor} = sipserver_sup:start_extras(Supervisor, AppModule, AppSupdata),
 	    {ok, Supervisor} = sipserver_sup:start_transportlayer(Supervisor),
-	    logger:log(normal, "proxy started (YXA version ~s)", ["TODO: hacky version"]),
+	    {ok, Vsn} = application:get_key(yxa, vsn),
+	    logger:log(normal, "proxy started (YXA version ~s)", [Vsn]),
 	    {ok, Supervisor};
 	Unknown ->
 	    E = lists:flatten(io_lib:format("Failed starting supervisor : ~p", [Unknown])),
