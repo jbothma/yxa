@@ -32,6 +32,30 @@ To run:
 
     ./sipserver/bin/sipserver start
 
+=======
+Testing
+=======
+
+An escript can be made to test the currently-supported functions.
+
+    cd apps/siptest
+    ../../rebar escriptize
+
+This generates the siptest escript.
+
+To run the tests:
+
+      ./siptest invite 192.168.2.2
+    or
+      ./siptest invite localhost
+
+siptest assumes it is running on the same host as the server.
+
+This will send an INVITE message to the server and wait until a response is
+received. Instead of 'invite', 'options' can be used to send an OPTIONS request.
+
+The response from the server is printed to stdout and the script exits.
+
 ============
 Applications
 ============
