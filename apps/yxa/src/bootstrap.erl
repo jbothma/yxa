@@ -2,8 +2,7 @@
 %%% File    : bootstrap.erl
 %%% @author   Fredrik Thulin <ft@it.su.se>
 %%% @doc      Initialize Mnesia databases needed for an YXA
-%%%           installation. Run through the 'yxa-bootstrap' shell
-%%%           script.
+%%%           installation.
 %%%
 %%% @since    07 Oct 2003 by Fredrik Thulin <ft@it.su.se>
 %%% @end
@@ -14,21 +13,13 @@
 	 replica/1
 	]).
 
--define(DB_MODULES, [phone,
-		     database_regexproute,
-		     database_forward,
-		     database_call,
+-define(DB_MODULES, [
 		     cpl_db,
 		     database_gruu,
 		     database_eventdata
 		    ]).
 
--define(MNESIA_TABLES, [user,
-			numbers,
-			phone,
-			regexproute,
-			forward,
-			%% call
+-define(MNESIA_TABLES, [
 			cpl_script_graph,
 			gruu,
 			eventdata
@@ -127,7 +118,7 @@ replica([Master]) ->
     end,
 
     %% basic sanity check of MasterNode
-    case check_node_has_tables(MasterNode, [phone, user, numbers, regexproute]) of
+    case check_node_has_tables(MasterNode, []) of
 	true ->
 	    ok;
 	false ->
