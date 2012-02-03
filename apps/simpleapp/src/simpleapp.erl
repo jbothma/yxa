@@ -66,9 +66,17 @@ init() ->
 %% INVITE
 %%
 request(#request{method = "INVITE"} = Request, YxaCtx) ->
-    io:format("simpleapp received INVITE ~p ~p~n", [Request, YxaCtx]),
-    transactionlayer:send_response_handler(YxaCtx#yxa_ctx.thandler, 486, "Busy Here"),
+    io:format("simpleapp received INVITE.~n"),
+    transactionlayer:send_response_handler(YxaCtx#yxa_ctx.thandler,
+					   486,
+					   "Busy Here (simpleapp demo)"),
     ok;
+
+request(#request{method = "OPTIONS"} = Request, YxaCtx) ->
+    AllowMethods = [{"Allow", ["AWESOME_STUFF"]}],
+    siprequest:request_to_me(Request, YxaCtx, AllowMethods),
+    ok;
+
 
 request(Request, YxaCtx) ->
     io:format("unhandled request ~p ~p~n", [Request, YxaCtx]),
