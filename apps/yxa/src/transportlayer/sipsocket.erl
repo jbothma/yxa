@@ -120,12 +120,9 @@ init([]) ->
 	    [public, bag, named_table]),
     UDP = {sipsocket_udp, {sipsocket_udp, start_link, []},
 	   permanent, 2000, worker, [sipsocket_udp]},
-    TCP = {tcp_dispatcher, {sipsocket_tcp, start_link, []},
-	   permanent, 2000, worker, [tcp_dispatcher]},
-    TCPlisteners = tcp_dispatcher:get_listenerspecs(),
     BlackList = {sipsocket_blacklist, {sipsocket_blacklist, start_link, []},
 		 permanent, 2000, worker, [sipsocket_blacklist]},
-    MyList = [UDP, TCP] ++ TCPlisteners ++ [BlackList],
+    MyList = [UDP] ++ [BlackList],
     {ok, {{one_for_one, 5, 60}, MyList}}.
 
 
