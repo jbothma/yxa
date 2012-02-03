@@ -224,7 +224,7 @@ init2({Request, YxaCtx, Branch, Parent}) when is_record(Request, request) ->
     DId = lists:concat(["c=", CallId, "; ft=", FromTag, "; tt=", ToTag]),
     [From] = keylist:fetch('from', Request#request.header),
     [To] = keylist:fetch('to', Request#request.header),
-    %event_handler:new_request(Method, URI, Branch, DId, From, To),
+    event_handler:new_request(Method, URI, Branch, DId, From, To),
 
     %% RFC3261 17.2.1 says the _transaction layer_ MUST generate a 100 Trying in response
     %% to an INVITE unless it _knows_ the TU will generate a response within 200 ms. We
@@ -1056,7 +1056,7 @@ event_final_response(Created, State, Status) when Status >= 200 ->
     case State#state.testing of
 	true -> ok;
 	false ->
-	    ok%event_handler:uas_result(Branch, Created, Status, Reason, L)
+	    event_handler:uas_result(Branch, Created, Status, Reason, L)
     end;
 event_final_response(_Created, _State, _Status) ->
     %% Don't make events out of every non-final response we send

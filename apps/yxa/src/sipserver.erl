@@ -79,7 +79,7 @@ start(normal, [AppModule]) ->
 	    end,
 	    ok = init_mnesia(MnesiaTables),
 	    ok = gen_server:call(yxa_monitor, {add_mnesia_tables, MnesiaTables}),
-
+	    {ok, Supervisor} = sipserver_sup:start_extras(Supervisor, AppModule, AppSupdata),
 	    {ok, Supervisor} = sipserver_sup:start_transportlayer(Supervisor),
 	    logger:log(normal, "proxy started (YXA version ~s)", ["TODO: hacky version"]),
 	    {ok, Supervisor};
@@ -2032,7 +2032,7 @@ test_parse_packet2_loop_detection() ->
 		uri   = sipurl:parse("sip:regexp2@" ++ HomedomainStr)
 	       },
 
-    {ok, _SipSocket_Res1, Branch_Res1} =
+    {ok, _SipSocket_Res1, _Branch_Res1} =
 	transportlayer:send_proxy_request(TestSipSocket, Request1, TestSipDst1,
 					  ["branch=z9hG4bK-yxa-unittest-unique"]
 					 ),
@@ -2053,7 +2053,7 @@ test_parse_packet2_loop_detection() ->
     Request2 = sippacket:parse(SentMessage1, none),
     #request{} = Request2,
 
-    {ok, Request3, YxaCtx1} = process_parsed_packet(Request2, TestOrigin1),
+    {ok, Request3, _YxaCtx1} = process_parsed_packet(Request2, TestOrigin1),
 
     autotest:mark(?LINE, "parse_packet1/2 - Loop detection - 1.2"),
     %% Now, pretend we spiral the request again (now, it is a request with a Via
@@ -2064,7 +2064,7 @@ test_parse_packet2_loop_detection() ->
 			  },
 
 
-    {ok, _SipSocket_Res2, Branch_Res2} =
+    {ok, _SipSocket_Res2, _Branch_Res2} =
 	transportlayer:send_proxy_request(TestSipSocket, Request3, TestSipDst2, []),
 
     {ok, SentMessage2} = test_get_sipsocket_sent_message(TestSipDst2),
@@ -2076,7 +2076,7 @@ test_parse_packet2_loop_detection() ->
     Request4 = sippacket:parse(SentMessage2, none),
     #request{} = Request4,
 
-    {ok, Request5, YxaCtx2} = process_parsed_packet(Request4, TestOrigin1),
+    {ok, _Request5, _YxaCtx2} = process_parsed_packet(Request4, TestOrigin1),
 
     ok.
 

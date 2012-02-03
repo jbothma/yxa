@@ -1108,7 +1108,7 @@ perform_branchaction(tell_parent, State) when is_record(State, state) ->
 			IsFinalResponse, State#state.testing == false ->
 			    %% Make event out of final response
 			    L = [{dst, sipdst:dst2str(State#state.dst)}],
-			    %event_handler:uac_result(Branch, Status, Reason, L),
+			    event_handler:uac_result(Branch, Status, Reason, L),
 			    State#state{final_r_sent = true};
 			IsFinalResponse, State#state.testing == true ->
 			    State#state{final_r_sent = true};
