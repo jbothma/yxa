@@ -2,8 +2,8 @@
 
 -export([main/1]).
 
-main(["invite", _Host]) ->
-    siptest_utils:invite();
+main(["invite", Host]) ->
+    siptest_utils:invite(Host);
 
-main(["options", _Host]) ->
-    siptest_utils:options().
+main(["options", Host]) ->
+    siptest_utils:options(Host).
